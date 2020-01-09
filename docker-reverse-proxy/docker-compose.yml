@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+
+  web:
+    image: test
+    command: ["sh", "app.sh"]
+    env_file: 
+      - .env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+      - "9002:9002"
