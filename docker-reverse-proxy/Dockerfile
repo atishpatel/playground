@@ -41,10 +41,12 @@ RUN set -eux; \
 	export PATH="/usr/local/go/bin:$PATH"; \
 	go version
 
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 ## dl node
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 RUN apt-get install -y nodejs
-# RUN npm install gulp -g
+RUN npm install gulp -g
 # RUN npm install yarn -g
 
 # copy nginx.conf
@@ -54,16 +56,10 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY . .
 
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-
 # setup golang 
 RUN go get -d ./...
 RUN go build -o=./bin/server1 ./server1/*.go
-RUN go build -o=./bin/server2 ./server2/*.go
 
 # setup node
-
-
-# setup nginx
+RUN cd server2 && npm install && cd ..
 

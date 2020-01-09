@@ -2,7 +2,7 @@ version: "3.7"
 services:
 
   web:
-    image: test
+    image: docker-reverse-proxy
     command: ["sh", "app.sh"]
     env_file: 
       - .env
