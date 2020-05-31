@@ -71,13 +71,13 @@ func readLines(filename string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	lines := strings.Split(string(content), "\n")
+	lines := strings.Split(string(content), "\r\n")
 	return lines, nil
 }
 
 // writeLines writes the lines to the given file.
 func writeLines(lines []string, filename string) error {
-	data := []byte(strings.Join(lines, "\n"))
+	data := []byte(strings.Join(lines, "\r\n"))
 	err := ioutil.WriteFile(filename, data, 0666)
 	if err != nil {
 		return err

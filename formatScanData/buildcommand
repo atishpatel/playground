@@ -1,1 +1,1 @@
-env GOOS=darwin GOARCH=amd64 go build ./
+env GOOS=windows GOARCH=386 go build ./
