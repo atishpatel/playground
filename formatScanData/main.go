@@ -4,10 +4,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 )
 
 func main() {
+	oldFolder := "PM_OLD"
+	err := os.MkdirAll(oldFolder, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
 	files, err := ioutil.ReadDir("./")
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +33,7 @@ func main() {
 			}
 			fmt.Println(f.Name(), " fixing")
 			fOldName := strings.Replace(fName, ".txt", "_old.txt", 1)
-			err = writeLines(lines, fOldName)
+			err = writeLines(lines, oldFolder+"/"+fOldName)
 			if err != nil {
 				log.Fatalf("old file writeLines: %s", err)
 			}
