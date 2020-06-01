@@ -61,7 +61,7 @@ func updateLines(lines []string) {
 		l := strings.Split(lines[i], "|")
 		number := strings.TrimSpace(l[36])
 		if len(number) == 10 {
-			number = number[3:]
+			number = number[4:]
 		} else {
 			number = ""
 		}
