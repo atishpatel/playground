@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"fyne.io/fyne/app"
+	"fyne.io/fyne/widget"
 )
 
 func main() {
@@ -19,6 +21,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	message := ""
+
 	for _, f := range files {
 		fName := f.Name()
 		if strings.Contains(fName, ".txt") && !strings.Contains(fName, "_old.txt") {
@@ -28,10 +32,10 @@ func main() {
 				log.Fatalf("readLines: %s", err)
 			}
 			if !needsFixing(lines) {
-				fmt.Println(f.Name(), " is already fixed")
+				message += f.Name() + " is already fixed\n"
 				continue
 			}
-			fmt.Println(f.Name(), " fixing")
+			message += f.Name() + " fixing\n"
 			fOldName := strings.Replace(fName, ".txt", "_old.txt", 1)
 			err = writeLines(lines, oldFolder+"/"+fOldName)
 			if err != nil {
@@ -44,6 +48,17 @@ func main() {
 			}
 		}
 	}
+	app := app.New()
+
+	w := app.NewWindow("Format Changed")
+	w.SetContent(widget.NewVBox(
+		widget.NewLabel(message),
+		widget.NewButton("Quit", func() {
+			app.Quit()
+		}),
+	))
+
+	w.ShowAndRun()
 }
 
 func needsFixing(lines []string) bool {
