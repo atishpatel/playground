@@ -4,15 +4,25 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/widget"
 )
 
+var reg *regexp.Regexp
+
 func main() {
+	// Make a Regex to say we only want letters and numbers
+	var err error
+	reg, err = regexp.Compile("[^0-9]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	oldFolder := "PM_OLD"
-	err := os.MkdirAll(oldFolder, os.ModePerm)
+	err = os.MkdirAll(oldFolder, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +45,7 @@ func main() {
 				message += f.Name() + " is already fixed\n"
 				continue
 			}
-			message += f.Name() + " fixing\n"
+			message += f.Name() + " fixed\n"
 			fOldName := strings.Replace(fName, ".txt", "_old.txt", 1)
 			err = writeLines(lines, oldFolder+"/"+fOldName)
 			if err != nil {
@@ -75,8 +85,11 @@ func updateLines(lines []string) {
 	for i := 1; i < len(lines); i++ {
 		l := strings.Split(lines[i], "|")
 		number := strings.TrimSpace(l[36])
+		number = reg.ReplaceAllString(number, "")
 		if len(number) == 10 {
 			number = number[4:]
+		} else if len(number) == 6 {
+			// keep number
 		} else {
 			number = ""
 		}
