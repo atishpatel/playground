@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# go get github.com/cespare/reflex
+
+# Go on port 8080
+export `less .env | xargs`
+reflex -r '\.go$' -R node_modules/ -s go run ./
+
+trap 'kill $(jobs -p)' EXIT
+exit 0
+
+wait
