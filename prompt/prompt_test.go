@@ -32,7 +32,7 @@ func TestInt(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			r := bufio.NewReader(strings.NewReader(tC.input))
+			r := bufio.NewScanner(strings.NewReader(tC.input))
 			w := new(bytes.Buffer)
 			// w := os.Stdout
 			prompt := New(w, r)

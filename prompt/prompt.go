@@ -9,12 +9,12 @@ import (
 )
 
 type Prompter struct {
-	reader    *bufio.Reader
+	reader    *bufio.Scanner
 	writer    io.Writer
 	Tolerance int
 }
 
-func New(w io.Writer, r *bufio.Reader) *Prompter {
+func New(w io.Writer, r *bufio.Scanner) *Prompter {
 	return &Prompter{
 		reader:    r,
 		writer:    w,
@@ -26,15 +26,14 @@ func (p *Prompter) Int(request string, min, max int) int {
 	v := 0
 	for count := 0; count < p.Tolerance; count++ {
 		fmt.Fprintf(p.writer, "%s", request)
-		s, err := p.reader.ReadString('\n')
-		if err != nil && s == "" {
-			if err == io.EOF {
-				fmt.Fprintf(p.writer, "EOF Error: %s %s\n", s, err.Error())
-				break
+		ok := p.reader.Scan()
+		if !ok {
+			if p.reader.Err() != nil {
+				fmt.Fprintf(p.writer, "ReadError: %s\n", p.reader.Err())
 			}
-			fmt.Fprintf(p.writer, "ReadError: %s\n", err.Error())
-			continue
+			break
 		}
+		s := p.reader.Text()
 		i, err := strconv.ParseInt(strings.TrimSuffix(s, "\n"), 10, 64)
 		if err != nil {
 			fmt.Fprintf(p.writer, "ParseError: %s\n", err.Error())
