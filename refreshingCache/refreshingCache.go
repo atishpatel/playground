@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"k8s.io/klog/v2"
@@ -14,6 +15,7 @@ type client interface {
 
 type RefreshingCache struct {
 	output             chan map[string]string
+	refreshedTimestampLock sync.RWMutex
 	refreshedTimestamp time.Time
 }
 
@@ -22,6 +24,8 @@ func (c *RefreshingCache) Get() map[string]string {
 }
 
 func (c *RefreshingCache) RefreshedTimestamp() time.Time {
+	c.refreshedTimestampLock.RLock()
+	defer c.refreshedTimestampLock.RUnlock()
 	return c.refreshedTimestamp
 }
 
@@ -36,6 +40,7 @@ func NewRefreshingCache(ctx context.Context, client client) (*RefreshingCache, e
 	c := &RefreshingCache{
 		output:             output,
 		refreshedTimestamp: time.Now(),
+		refreshedTimestampLock: sync.RWMutex{},
 	}
 	// go routine to return the current cache
 	go func() {
@@ -46,7 +51,9 @@ func NewRefreshingCache(ctx context.Context, client client) (*RefreshingCache, e
 			case current = <-updateChan:
 				// update current
 				klog.Infof("successfully updated cache")
+				c.refreshedTimestampLock.Lock()
 				c.refreshedTimestamp = time.Now()
+				c.refreshedTimestampLock.Unlock()
 			case output <- current:
 				// nop, we just want to send the current data any time someone
 				// wants it
